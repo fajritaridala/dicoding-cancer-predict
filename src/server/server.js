@@ -6,8 +6,8 @@ import { InputError } from '../exceptions/InputError.js';
 
 const main = async () => {
   const server = Hapi.server({
-    port: 5000,
-    host: 'localhost',
+    port: process.env.PORT || 5000,
+    host: '0.0.0.0',
     routes: {
       cors: {
         origin: ['*'],
@@ -23,15 +23,6 @@ const main = async () => {
   server.ext('onPreResponse', (req, h) => {
     const res = req.response;
 
-    // if (res instanceof InputError) {
-    //   const newRes = h.response({
-    //     status: 'fail',
-    //     message: `${res.message} Silakan gunakan foto lain.`,
-    //   });
-    //   newRes.code(res.output.statusCode);
-    //   return newRes;
-    // }
-
     if (res.isBoom && res.output.statusCode === 413) {
       const newRes = h.response({
         status: 'fail',
@@ -40,14 +31,6 @@ const main = async () => {
       newRes.code(413);
       return newRes;
     }
-    // if (res.isBoom) {
-    //   const newRes = h.response({
-    //     status: 'fail',
-    //     message: res.message,
-    //   });
-    //   newRes.code(res.output.statusCode);
-    //   return newRes;
-    // }
 
     if (res instanceof InputError || (res.isBoom && res.output.statusCode === 400)) {
       // const statusCode =res instanceof InputError ? res.statusCode : res.output.statusCode;
